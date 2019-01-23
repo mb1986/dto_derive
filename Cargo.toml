@@ -1,12 +1,20 @@
 [package]
 name = "dto_derive"
+description = """
+Derive for automatic mapping DTOs to Entities and vice versa.
+"""
 version = "0.1.0"
 authors = ["Michał Blinkiewicz <michal.blinkiewicz@gmail.com>"]
+repository = "https://github.com/mb1986/dto_derive"
+readme = "README.md"
+license = "MIT"
+keywords = ["dto", "data", "transfer", "entity", "derive"]
+categories = ["data-structures", "web-programming", "rust-patterns"]
 edition = "2018"
 
 [lib]
 proc-macro = true
 
 [dependencies]
-syn = { version = "0.15.25", features = ["extra-traits"] }
-quote = "0.6.10"
+syn = { version = "0.15", features = ["full", "extra-traits"] }
+quote = "0.6"
