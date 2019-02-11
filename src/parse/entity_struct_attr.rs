@@ -4,19 +4,19 @@ use syn::parse::ParseStream;
 use syn::punctuated::Punctuated;
 use crate::helpers::Sequence;
 use super::SpannedParse;
+use crate::entity::{Entity, EntityType, EntityCompanionTypes};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub(crate) struct EntityStructAttr {
-    pub(crate) entity: TypePath,
-    pub(crate) with: Option<Punctuated<TypePath, Token![,]>>,
+    pub(crate) entity: Entity,
     pub(crate) span: Span,
 }
 
 impl SpannedParse for EntityStructAttr {
     fn parse(input: ParseStream, span: Span) -> Result<Self> {
-        let entity = parse_entity_arg(&input)?;
-        let with = parse_with_arg(&input)?;
-        Ok(EntityStructAttr { entity, with, span})
+        let entity_type = parse_entity_arg(&input).map(EntityType)?;
+        let companion_types = parse_companion_arg(&input)?.map(EntityCompanionTypes);
+        Ok(EntityStructAttr { entity: Entity { entity_type, companion_types }, span })
     }
 }
 
@@ -32,10 +32,10 @@ fn parse_entity_arg(input: &ParseStream) -> Result<TypePath> {
     }
 }
 
-fn parse_with_arg(input: &ParseStream) -> Result<Option<Punctuated<TypePath, Token![,]>>> {
+fn parse_companion_arg(input: &ParseStream) -> Result<Option<Punctuated<TypePath, Token![,]>>> {
     if input.peek(Token![,]) {
         input.parse::<Token![,]>()?;
-        input.parse::<super::kw::with>()?;
+        input.parse::<super::kw::companion>()?;
         input.parse::<Token![=]>()?;
         let with_lit = input.parse::<Lit>()?;
         if let Lit::Str(ref with_names) = with_lit {

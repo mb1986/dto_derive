@@ -1,6 +1,8 @@
 extern crate proc_macro;
 
 mod dto_info;
+mod entity;
+mod mapping;
 mod parse;
 mod expand;
 mod container;
@@ -31,11 +33,11 @@ fn process_dto_macro_derive(input: &DeriveInput) -> Result<TokenStream> {
 
     parse_struct_attrs(&input.attrs, |attr| {
         match attr {
-            StructAttr::Entity(a) => cont.set_entity(a),
-            StructAttr::Request(a) => cont.set_request(a),
-            StructAttr::Response(a) => cont.set_response(a),
-            StructAttr::Map(a) => cont.set_map(a),
-            StructAttr::Skip(a) => cont.set_skip(a),
+            StructAttr::Entity(a) => cont.set_entity(a.entity, a.span),
+            StructAttr::Request(a) => cont.set_request(a.span),
+            StructAttr::Response(a) => cont.set_response(a.span),
+            StructAttr::Map(a) => cont.add_mapping(a.mapping, a.span),
+            StructAttr::Skip(a) => cont.add_skips(&a.skips, a.span),
         }
     })?;
 

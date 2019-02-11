@@ -1,21 +1,13 @@
 use proc_macro2::Span;
-use syn::{Token, Lit, LitInt, Ident, Expr, ExprCall, ExprClosure, Path, Result, Error};
+use syn::{Token, Lit, Ident, Expr, Path, Result, Error};
 use syn::parse::{Parse, ParseStream};
 use super::SpannedParse;
+use crate::mapping::{Mapping, MappingTarget, MappingSource};
 
 #[derive(Debug)]
 pub(crate) struct MapStructAttr {
-    pub(crate) target: Ident,
-    pub(crate) source: MapStructAttrSource,
+    pub(crate) mapping: Mapping,
     pub(crate) span: Span,
-}
-
-#[derive(Debug)]
-pub(crate) enum MapStructAttrSource {
-    Field(Ident),
-    ArgNo(LitInt),
-    Call(ExprCall),
-    Closure(ExprClosure),
 }
 
 impl SpannedParse for MapStructAttr {
@@ -39,16 +31,20 @@ impl SpannedParse for MapStructAttr {
             match right {
                 Expr::Path(ref expr) if expr.path.check_ident() => {
                     Ok(MapStructAttr {
-                        target: left,
-                        source: MapStructAttrSource::Field(expr.path.into_ident()),
+                        mapping: Mapping {
+                            target: MappingTarget(left),
+                            source: MappingSource::Field(expr.path.into_ident()),
+                        },
                         span,
                     })
                 },
                 Expr::Lit(expr) => {
                     if let Lit::Int(int) = expr.lit {
                         Ok(MapStructAttr {
-                            target: left,
-                            source: MapStructAttrSource::ArgNo(int),
+                            mapping: Mapping {
+                                target: MappingTarget(left),
+                                source: MappingSource::ArgNo(int),
+                            },
                             span,
                         })
                     } else {
@@ -57,15 +53,19 @@ impl SpannedParse for MapStructAttr {
                 },
                 Expr::Call(expr) => {
                     Ok(MapStructAttr {
-                        target: left,
-                        source: MapStructAttrSource::Call(expr),
+                        mapping: Mapping {
+                            target: MappingTarget(left),
+                            source: MappingSource::Call(expr),
+                        },
                         span,
                     })
                 },
                 Expr::Closure(expr) => {
                     Ok(MapStructAttr {
-                        target: left,
-                        source: MapStructAttrSource::Closure(expr),
+                        mapping: Mapping {
+                            target: MappingTarget(left),
+                            source: MappingSource::Closure(expr),
+                        },
                         span,
                     })
                 },

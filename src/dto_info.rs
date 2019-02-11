@@ -8,7 +8,7 @@ pub(crate) enum DtoKind {
 
 #[derive(Debug)]
 pub(crate) struct DtoInfo<'a> {
-    pub(crate) name: &'a Ident,
+    pub(crate) dto_type: &'a Ident,
     pub(crate) kind: Option<&'a DtoKind>,
     pub(crate) fields: Vec<&'a Field>,
     pub(crate) generics: &'a Generics,
@@ -16,11 +16,11 @@ pub(crate) struct DtoInfo<'a> {
 
 impl DtoInfo<'_> {
     pub(crate) fn from_derive(derive: &DeriveInput) -> Result<DtoInfo> {
-        let name = &derive.ident;
-        let kind = get_dto_kind(name);
+        let dto_type = &derive.ident;
+        let kind = get_dto_kind(dto_type);
         let fields = get_dto_fields(derive)?;
         let generics = &derive.generics;
-        Ok(DtoInfo { name, kind, fields, generics })
+        Ok(DtoInfo { dto_type, kind, fields, generics })
     }
 }
 
