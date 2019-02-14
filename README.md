@@ -1,5 +1,7 @@
 # #[derive(Dto)]
 
+[![Build Status](https://travis-ci.com/mb1986/dto_derive.svg?branch=develop)](https://travis-ci.com/mb1986/dto_derive)
+
 This crate provides `Dto` derive for automatic mapping
 DTOs to Entities and vice versa.
 

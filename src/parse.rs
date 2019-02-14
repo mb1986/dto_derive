@@ -9,7 +9,7 @@ mod skip_struct_attr;
 pub(crate) use self::skip_struct_attr::SkipStructAttr;
 
 mod map_struct_attr;
-pub(crate) use self::map_struct_attr::{MapStructAttr, MapStructAttrSource};
+pub(crate) use self::map_struct_attr::MapStructAttr;
 
 mod request_struct_attr;
 pub(crate) use self::request_struct_attr::RequestStructAttr;
@@ -19,7 +19,6 @@ pub(crate) use self::response_struct_attr::ResponseStructAttr;
 
 pub(crate) mod kw {
     syn::custom_keyword!(entity);
-    syn::custom_keyword!(with);
     syn::custom_keyword!(request);
     syn::custom_keyword!(response);
     syn::custom_keyword!(map);
