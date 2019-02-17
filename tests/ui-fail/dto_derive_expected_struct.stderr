@@ -1,0 +1,8 @@
+error: expected struct
+ --> $DIR/dto_derive_expected_struct.rs:5:6
+  |
+5 | enum EnumDto { } //~ ERROR expected struct
+  |      ^^^^^^^
+
+error: aborting due to previous error
+

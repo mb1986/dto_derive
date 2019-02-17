@@ -1,0 +1,14 @@
+error: expected string literal containing entity type
+ --> $DIR/dto_derive_entity_attr.rs:5:16
+  |
+5 | #[dto(entity = 123)] //~ ERROR expected string literal containing entity type
+  |                ^^^
+
+error: already set an entity attribute
+  --> $DIR/dto_derive_entity_attr.rs:10:6
+   |
+10 | #[dto(entity = "Entity")] //~ ERROR already set an entity attribute
+   |      ^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 2 previous errors
+
