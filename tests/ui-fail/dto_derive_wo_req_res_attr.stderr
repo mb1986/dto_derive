@@ -1,0 +1,8 @@
+error: could not determine request/response
+ --> $DIR/dto_derive_wo_req_res_attr.rs:4:28
+  |
+4 | #[derive(Debug, PartialEq, Dto)] //~ ERROR could not determine request/response
+  |                            ^^^
+
+error: aborting due to previous error
+

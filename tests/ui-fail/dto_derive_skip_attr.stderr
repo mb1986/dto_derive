@@ -1,0 +1,38 @@
+error: expected string literal containing field names separated by comma
+ --> $DIR/dto_derive_skip_attr.rs:5:14
+  |
+5 | #[dto(skip = 123)] //~ ERROR expected string literal containing field names separated by comma
+  |              ^^^
+
+error: expected at least one field name
+ --> $DIR/dto_derive_skip_attr.rs:9:14
+  |
+9 | #[dto(skip = "")] //~ ERROR expected at least one field name
+  |              ^^
+
+error: field 'a' does not exist
+  --> $DIR/dto_derive_skip_attr.rs:13:6
+   |
+13 | #[dto(skip = "a, b, c")] //~ ERROR field 'a' does not exist
+   |      ^^^^^^^^^^^^^^^^^^
+
+error: field 'b' does not exist
+  --> $DIR/dto_derive_skip_attr.rs:17:6
+   |
+17 | #[dto(skip = "a, b, c")] //~ ERROR field 'b' does not exist
+   |      ^^^^^^^^^^^^^^^^^^
+
+error: already skipped 'b'
+  --> $DIR/dto_derive_skip_attr.rs:24:6
+   |
+24 | #[dto(skip = "b")] //~ ERROR already skipped 'b'
+   |      ^^^^^^^^^^^^
+
+error: already skipped 'b'
+  --> $DIR/dto_derive_skip_attr.rs:32:6
+   |
+32 | #[dto(skip = "a, b, b, c")]  //~ ERROR already skipped 'b'
+   |      ^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 6 previous errors
+
