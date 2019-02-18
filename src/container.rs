@@ -1,4 +1,3 @@
-use itertools::{Itertools, process_results};
 use proc_macro2::Span;
 use std::collections::{HashSet, HashMap};
 use syn::{Error, Result, Ident, Generics, TypePath};
@@ -59,21 +58,17 @@ impl<'a> Container<'a> {
     where
         &'b T: IntoIterator<Item = &'b Ident>,
     {
-        let mut count_overlapped = 0;
-        let already_skipped = skip.into_iter()
-            .filter(|ident| self.skipped.contains(ident))
-            .inspect(|_| count_overlapped += 1)
-            .join(", ");
-        if count_overlapped == 0 {
-            process_results(skip.into_iter().map(|s| {
-                self.mapping.remove(&MappingTarget(s.clone())).map(|_| ())
-                    .ok_or(Error::new(span, format!("field '{}' does not exist", s)))
-            }), |iter| iter.count())?;
-            self.skipped.extend(skip.into_iter().cloned());
-            Ok(())
-        } else {
-            Err(Error::new(span, format!("already skipped '{}'", already_skipped)))
+        for s in skip {
+            if self.skipped.contains(s) {
+                return Err(Error::new(span, format!("already skipped '{}'", s)));
+            }
+            self.skipped.insert(s.clone());
+
+            if self.mapping.remove(&MappingTarget(s.clone())).is_none() {
+                return Err(Error::new(span, format!("field '{}' does not exist", s)));
+            }
         }
+        Ok(())
     }
 
     pub(crate) fn set_request(&mut self, span: Span) -> Result<()> {
