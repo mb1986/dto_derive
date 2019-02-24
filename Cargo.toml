@@ -19,7 +19,6 @@ proc-macro = true
 proc-macro2 = { version = "0.4" }
 syn = { version = "0.15", features = ["full", "extra-traits"] }
 quote = "0.6"
-itertools = "0.8"
 
 [dev-dependencies]
 compiletest_rs = { version = "*", features = ["stable"] }

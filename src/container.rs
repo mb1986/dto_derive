@@ -9,8 +9,10 @@ pub(crate) struct Container<'a> {
     info: &'a DtoInfo<'a>,
     entity: Option<TypePath>,
     kind: Option<DtoKind>,
+    fields: HashSet<Ident>,
     mapping: HashMap<MappingTarget, MappingSource>,
     skipped: HashSet<Ident>,
+    mapped: HashSet<Ident>,
 }
 
 #[derive(Debug)]
@@ -24,17 +26,23 @@ pub(crate) struct SealedContainer<'a> {
 
 impl<'a> Container<'a> {
     pub(crate) fn new(info: &'a DtoInfo) -> Container<'a> {
+        let mut fields = HashSet::with_capacity(info.fields.len());
+        fields.extend(info.fields.iter().map(|field| field.ident.clone().unwrap()));
+
         let mut mapping = HashMap::with_capacity(info.fields.len());
         mapping.extend(info.fields.iter().map(|field| (
             MappingTarget(field.ident.clone().unwrap()),
             MappingSource::Field(field.ident.clone().unwrap()),
         )));
+
         Container {
             info,
             entity: None,
             kind: None,
+            fields,
             mapping,
             skipped: HashSet::new(),
+            mapped: HashSet::new(),
         }
     }
 
@@ -47,11 +55,19 @@ impl<'a> Container<'a> {
         }
     }
 
-    pub(crate) fn add_mapping(&mut self, mapping: Mapping, _span: Span) -> Result<()> {
-        self.mapping.remove(
-            &MappingTarget(match mapping.source { MappingSource::Field(ref ident) => ident.clone() }));
-        self.mapping.insert(mapping.target, mapping.source);
-        Ok(())
+    pub(crate) fn add_mapping(&mut self, mapping: Mapping, span: Span) -> Result<()> {
+        if !self.mapped.contains(&mapping.target) {
+            self.mapping.remove(
+                &MappingTarget(
+                    match mapping.source { MappingSource::Field(ref ident) => ident.clone() }
+                ));
+            self.mapped.insert(mapping.target.0.clone());
+            self.mapping.insert(mapping.target, mapping.source);
+            Ok(())
+        } else {
+            Err(Error::new(span, format!(
+                "could not map already mapped field '{}'", mapping.target.0)))
+        }
     }
 
     pub(crate) fn add_skips<'b, T>(&mut self, skip: &'b T, span: Span) -> Result<()>
@@ -90,10 +106,13 @@ impl<'a> Container<'a> {
     }
 
     pub(crate) fn seal(&self) -> Result<SealedContainer> {
+        let entity = self.entity.as_ref()
+            .ok_or(Error::new(Span::call_site(), "attribute entity is not set"))?;
+        let kind = self.get_kind()?;
+        self.check_mappings(kind)?;
         Ok(SealedContainer {
-            entity: self.entity.as_ref()
-                .ok_or(Error::new(Span::call_site(), "attribute entity is not set"))?,
-            kind: self.get_kind()?,
+            entity,
+            kind,
             mapping: &self.mapping,
             generics: self.info.generics,
             dto_type: self.info.dto_type,
@@ -104,5 +123,29 @@ impl<'a> Container<'a> {
         self.kind.as_ref()
             .or(self.info.kind)
             .ok_or(Error::new(Span::call_site(), "could not determine request/response"))
+    }
+
+    fn check_mappings(&self, kind: &DtoKind) -> Result<()> {
+        match kind {
+            DtoKind::Request => {
+                for s in self.mapping.values().filter_map(|v|
+                    match v { MappingSource::Field(ident) => Some(ident), })
+                {
+                    if !self.fields.contains(s) {
+                        return Err(Error::new(Span::call_site(), format!(
+                            "could not map non-existent field '{}'", s)));
+                    }
+                }
+            },
+            DtoKind::Response => {
+                for t in self.mapping.keys() {
+                    if !self.fields.contains(t) {
+                        return Err(Error::new(Span::call_site(), format!(
+                            "could not map non-existent field '{}'", t.0)));
+                    }
+                }
+            },
+        }
+        Ok(())
     }
 }
