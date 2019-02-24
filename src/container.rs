@@ -1,8 +1,9 @@
 use proc_macro2::Span;
-use std::collections::{HashSet, HashMap};
-use syn::{Error, Result, Ident, Generics, TypePath};
+use std::collections::{HashMap, HashSet};
+use syn::{Error, Generics, Ident, Result, TypePath};
+
 use crate::dto_info::{DtoInfo, DtoKind};
-use crate::mapping::{Mapping, MappingTarget, MappingSource};
+use crate::mapping::{Mapping, MappingSource, MappingTarget};
 
 #[derive(Debug)]
 pub(crate) struct Container<'a> {
@@ -30,10 +31,12 @@ impl<'a> Container<'a> {
         fields.extend(info.fields.iter().map(|field| field.ident.clone().unwrap()));
 
         let mut mapping = HashMap::with_capacity(info.fields.len());
-        mapping.extend(info.fields.iter().map(|field| (
-            MappingTarget(field.ident.clone().unwrap()),
-            MappingSource::Field(field.ident.clone().unwrap()),
-        )));
+        mapping.extend(info.fields.iter().map(|field| {
+            (
+                MappingTarget(field.ident.clone().unwrap()),
+                MappingSource::Field(field.ident.clone().unwrap()),
+            )
+        }));
 
         Container {
             info,
@@ -57,16 +60,17 @@ impl<'a> Container<'a> {
 
     pub(crate) fn add_mapping(&mut self, mapping: Mapping, span: Span) -> Result<()> {
         if !self.mapped.contains(&mapping.target) {
-            self.mapping.remove(
-                &MappingTarget(
-                    match mapping.source { MappingSource::Field(ref ident) => ident.clone() }
-                ));
+            self.mapping.remove(&MappingTarget(match mapping.source {
+                MappingSource::Field(ref ident) => ident.clone(),
+            }));
             self.mapped.insert(mapping.target.0.clone());
             self.mapping.insert(mapping.target, mapping.source);
             Ok(())
         } else {
-            Err(Error::new(span, format!(
-                "could not map already mapped field '{}'", mapping.target.0)))
+            Err(Error::new(
+                span,
+                format!("could not map already mapped field '{}'", mapping.target.0),
+            ))
         }
     }
 
@@ -106,7 +110,9 @@ impl<'a> Container<'a> {
     }
 
     pub(crate) fn seal(&self) -> Result<SealedContainer> {
-        let entity = self.entity.as_ref()
+        let entity = self
+            .entity
+            .as_ref()
             .ok_or(Error::new(Span::call_site(), "attribute entity is not set"))?;
         let kind = self.get_kind()?;
         self.check_mappings(kind)?;
@@ -120,31 +126,36 @@ impl<'a> Container<'a> {
     }
 
     fn get_kind(&self) -> Result<&DtoKind> {
-        self.kind.as_ref()
-            .or(self.info.kind)
-            .ok_or(Error::new(Span::call_site(), "could not determine request/response"))
+        self.kind.as_ref().or(self.info.kind).ok_or(Error::new(
+            Span::call_site(),
+            "could not determine request/response",
+        ))
     }
 
     fn check_mappings(&self, kind: &DtoKind) -> Result<()> {
         match kind {
             DtoKind::Request => {
-                for s in self.mapping.values().filter_map(|v|
-                    match v { MappingSource::Field(ident) => Some(ident), })
-                {
+                for s in self.mapping.values().filter_map(|v| match v {
+                    MappingSource::Field(ident) => Some(ident),
+                }) {
                     if !self.fields.contains(s) {
-                        return Err(Error::new(Span::call_site(), format!(
-                            "could not map non-existent field '{}'", s)));
+                        return Err(Error::new(
+                            Span::call_site(),
+                            format!("could not map non-existent field '{}'", s),
+                        ));
                     }
                 }
-            },
+            }
             DtoKind::Response => {
                 for t in self.mapping.keys() {
                     if !self.fields.contains(t) {
-                        return Err(Error::new(Span::call_site(), format!(
-                            "could not map non-existent field '{}'", t.0)));
+                        return Err(Error::new(
+                            Span::call_site(),
+                            format!("could not map non-existent field '{}'", t.0),
+                        ));
                     }
                 }
-            },
+            }
         }
         Ok(())
     }

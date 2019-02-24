@@ -1,4 +1,4 @@
-use syn::{DeriveInput, Ident, Field, Data, Result, Error, Generics};
+use syn::{Data, DeriveInput, Error, Field, Generics, Ident, Result};
 
 #[derive(Debug)]
 pub(crate) enum DtoKind {
@@ -20,7 +20,12 @@ impl DtoInfo<'_> {
         let kind = get_dto_kind(dto_type);
         let fields = get_dto_fields(derive)?;
         let generics = &derive.generics;
-        Ok(DtoInfo { dto_type, kind, fields, generics })
+        Ok(DtoInfo {
+            dto_type,
+            kind,
+            fields,
+            generics,
+        })
     }
 }
 
