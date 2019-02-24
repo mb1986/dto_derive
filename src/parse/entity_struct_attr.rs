@@ -1,6 +1,7 @@
 use proc_macro2::Span;
-use syn::{Token, Lit, TypePath, Result, Error};
 use syn::parse::ParseStream;
+use syn::{Error, Lit, Result, Token, TypePath};
+
 use super::SpannedParse;
 
 #[derive(Debug)]
@@ -23,7 +24,9 @@ fn parse_entity_arg(input: &ParseStream) -> Result<TypePath> {
     if let Lit::Str(ref entity_name) = entity_lit {
         Ok(entity_name.parse::<TypePath>()?)
     } else {
-        Err(Error::new_spanned(entity_lit,
-            "expected string literal containing entity type"))
+        Err(Error::new_spanned(
+            entity_lit,
+            "expected string literal containing entity type",
+        ))
     }
 }

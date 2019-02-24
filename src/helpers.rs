@@ -1,9 +1,12 @@
 use std::ops::Deref;
-use syn::Result;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
+use syn::Result;
 
-pub(crate) struct Sequence<T, P>(Punctuated<T, P>) where T: Parse, P: Parse;
+pub(crate) struct Sequence<T, P>(Punctuated<T, P>)
+where
+    T: Parse,
+    P: Parse;
 
 impl<T: Parse, P: Parse> Sequence<T, P> {
     pub(crate) fn into_inner(self) -> Punctuated<T, P> {
@@ -13,8 +16,7 @@ impl<T: Parse, P: Parse> Sequence<T, P> {
 
 impl<T: Parse, P: Parse> Parse for Sequence<T, P> {
     fn parse(input: ParseStream) -> Result<Self> {
-        input.parse_terminated::<T, P>(T::parse)
-            .map(Sequence)
+        input.parse_terminated::<T, P>(T::parse).map(Sequence)
     }
 }
 

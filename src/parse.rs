@@ -1,6 +1,6 @@
 use proc_macro2::Span;
-use syn::{Attribute, Result, parenthesized};
 use syn::parse::{Parse, ParseStream};
+use syn::{parenthesized, Attribute, Result};
 
 mod entity_struct_attr;
 pub(crate) use self::entity_struct_attr::EntityStructAttr;

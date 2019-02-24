@@ -1,5 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::quote;
+
 use crate::SealedContainer;
 
 pub(crate) fn expand_response(cont: &SealedContainer) -> TokenStream {
@@ -7,8 +8,11 @@ pub(crate) fn expand_response(cont: &SealedContainer) -> TokenStream {
 
     let dto = cont.dto_type;
     let entity = cont.entity;
-    let mappings: Vec<TokenStream> = cont.mapping.iter()
-        .map(|(l, r)| quote! { #l: entity.#r }).collect();
+    let mappings: Vec<TokenStream> = cont
+        .mapping
+        .iter()
+        .map(|(l, r)| quote! { #l: entity.#r })
+        .collect();
 
     let result = quote! {
         impl #impl_generics From<#entity> for #dto #ty_generics #where_clause {

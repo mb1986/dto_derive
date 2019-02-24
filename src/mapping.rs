@@ -1,7 +1,7 @@
-use std::ops::Deref;
 use proc_macro2::TokenStream;
-use syn::Ident;
 use quote::ToTokens;
+use std::ops::Deref;
+use syn::Ident;
 
 #[derive(Debug)]
 pub(crate) struct Mapping {

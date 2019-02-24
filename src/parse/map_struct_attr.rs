@@ -1,8 +1,9 @@
 use proc_macro2::Span;
-use syn::{Token, Lit, Ident, Expr, Path, Result, Error};
 use syn::parse::{Parse, ParseStream};
+use syn::{Error, Expr, Ident, Lit, Path, Result, Token};
+
 use super::SpannedParse;
-use crate::mapping::{Mapping, MappingTarget, MappingSource};
+use crate::mapping::{Mapping, MappingSource, MappingTarget};
 
 #[derive(Debug)]
 pub(crate) struct MapStructAttr {
@@ -16,7 +17,6 @@ impl SpannedParse for MapStructAttr {
         input.parse::<Token![=]>()?;
         let map_lit = input.parse::<Lit>()?;
         if let Lit::Str(ref map_expr) = map_lit {
-
             struct MapStructAttrLit(Ident, Expr);
             impl Parse for MapStructAttrLit {
                 fn parse(input: ParseStream) -> Result<Self> {
@@ -29,22 +29,20 @@ impl SpannedParse for MapStructAttr {
 
             let MapStructAttrLit(left, right) = map_expr.parse()?;
             match right {
-                Expr::Path(ref expr) if expr.path.check_ident() => {
-                    Ok(MapStructAttr {
-                        mapping: Mapping {
-                            target: MappingTarget(left),
-                            source: MappingSource::Field(expr.path.into_ident()),
-                        },
-                        span,
-                    })
-                },
-                _ => {
-                    Err(Error::new_spanned(right, "unexpected expression"))
-                }
+                Expr::Path(ref expr) if expr.path.check_ident() => Ok(MapStructAttr {
+                    mapping: Mapping {
+                        target: MappingTarget(left),
+                        source: MappingSource::Field(expr.path.into_ident()),
+                    },
+                    span,
+                }),
+                _ => Err(Error::new_spanned(right, "unexpected expression")),
             }
         } else {
-            Err(Error::new_spanned(map_lit,
-                "expected string literal containing mapping expression"))
+            Err(Error::new_spanned(
+                map_lit,
+                "expected string literal containing mapping expression",
+            ))
         }
     }
 }
@@ -59,8 +57,13 @@ impl IntoIdent for Path {
         self.leading_colon.is_none()
             && self.segments.len() == 1
             && self.segments[0].arguments.is_empty()
-            && self.segments[0].ident.to_string()
-                .chars().next().unwrap().is_lowercase()
+            && self.segments[0]
+                .ident
+                .to_string()
+                .chars()
+                .next()
+                .unwrap()
+                .is_lowercase()
     }
 
     fn into_ident(&self) -> Ident {

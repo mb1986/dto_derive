@@ -1,6 +1,7 @@
 use proc_macro2::Span;
-use syn::{Ident, Result};
 use syn::parse::ParseStream;
+use syn::{Ident, Result};
+
 use super::SpannedParse;
 
 #[derive(Debug, Clone)]
