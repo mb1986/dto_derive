@@ -11,6 +11,7 @@ pub(crate) struct Container<'a> {
     kind: Option<DtoKind>,
     mapping: HashMap<MappingTarget, MappingSource>,
     skipped: HashSet<Ident>,
+    mapped: HashSet<Ident>,
 }
 
 #[derive(Debug)]
@@ -35,6 +36,7 @@ impl<'a> Container<'a> {
             kind: None,
             mapping,
             skipped: HashSet::new(),
+            mapped: HashSet::new(),
         }
     }
 
@@ -47,11 +49,18 @@ impl<'a> Container<'a> {
         }
     }
 
-    pub(crate) fn add_mapping(&mut self, mapping: Mapping, _span: Span) -> Result<()> {
-        self.mapping.remove(
-            &MappingTarget(match mapping.source { MappingSource::Field(ref ident) => ident.clone() }));
-        self.mapping.insert(mapping.target, mapping.source);
-        Ok(())
+    pub(crate) fn add_mapping(&mut self, mapping: Mapping, span: Span) -> Result<()> {
+        if !self.mapped.contains(&mapping.target) {
+            self.mapping.remove(
+                &MappingTarget(
+                    match mapping.source { MappingSource::Field(ref ident) => ident.clone() }
+                ));
+            self.mapped.insert(mapping.target.0.clone());
+            self.mapping.insert(mapping.target, mapping.source);
+            Ok(())
+        } else {
+            Err(Error::new(span, format!("could not map already mapped field '{}'", mapping.target.0)))
+        }
     }
 
     pub(crate) fn add_skips<'b, T>(&mut self, skip: &'b T, span: Span) -> Result<()>
