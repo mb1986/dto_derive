@@ -14,6 +14,7 @@ mod expand;
 mod helpers;
 mod mapping;
 mod parse;
+mod spanned;
 
 #[proc_macro_derive(Dto, attributes(dto))]
 pub fn dto_macro_derive(input: TokenStream) -> TokenStream {
