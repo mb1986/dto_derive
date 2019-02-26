@@ -3,22 +3,22 @@ use dto_derive::Dto;
 
 #[derive(Debug, PartialEq, Dto)]
 #[dto(request)]
-#[dto(request)] //~ ERROR already set an direction attribute
+#[dto(request)] //~ ERROR duplicate `request`/`response` attribute
 struct Dto1 { }
 
 #[derive(Debug, PartialEq, Dto)]
 #[dto(request)]
-#[dto(response)] //~ ERROR already set an direction attribute
+#[dto(response)] //~ ERROR duplicate `request`/`response` attribute
 struct Dto2 { }
 
 #[derive(Debug, PartialEq, Dto)]
 #[dto(response)]
-#[dto(request)] //~ ERROR already set an direction attribute
+#[dto(request)] //~ ERROR duplicate `request`/`response` attribute
 struct Dto3 { }
 
 #[derive(Debug, PartialEq, Dto)]
 #[dto(response)]
-#[dto(response)] //~ ERROR already set an direction attribute
+#[dto(response)] //~ ERROR duplicate `request`/`response` attribute
 struct Dto4 { }
 
 

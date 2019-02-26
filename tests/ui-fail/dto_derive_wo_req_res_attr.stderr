@@ -1,7 +1,7 @@
-error: could not determine request/response
+error: required `request`/`response` attribute or struct name ending with `Request`/`Response`
  --> $DIR/dto_derive_wo_req_res_attr.rs:4:28
   |
-4 | #[derive(Debug, PartialEq, Dto)] //~ ERROR could not determine request/response
+4 | #[derive(Debug, PartialEq, Dto)] //~ ERROR required `request`/`response` attribute or struct name ending with `Request`/`Response`
   |                            ^^^
 
 error: aborting due to previous error

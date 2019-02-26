@@ -1,19 +1,19 @@
-error: could not map already mapped field 'a'
+error: cannot map already mapped field 'a'
  --> $DIR/dto_derive_map_attr.rs:6:6
   |
-6 | #[dto(map = "a: c")] //~ ERROR could not map already mapped field 'a'
+6 | #[dto(map = "a: c")] //~ ERROR cannot map already mapped field 'a'
   |      ^^^^^^^^^^^^^^
 
-error: could not map non-existent field 'c'
+error: cannot map non-existent field 'c'
  --> $DIR/dto_derive_map_attr.rs:9:28
   |
-9 | #[derive(Debug, PartialEq, Dto)] //~ ERROR could not map non-existent field 'c'
+9 | #[derive(Debug, PartialEq, Dto)] //~ ERROR cannot map non-existent field 'c'
   |                            ^^^
 
-error: could not map non-existent field 'c'
+error: cannot map non-existent field 'c'
   --> $DIR/dto_derive_map_attr.rs:20:28
    |
-20 | #[derive(Debug, PartialEq, Dto)] //~ ERROR could not map non-existent field 'c'
+20 | #[derive(Debug, PartialEq, Dto)] //~ ERROR cannot map non-existent field 'c'
    |                            ^^^
 
 error: aborting due to 3 previous errors

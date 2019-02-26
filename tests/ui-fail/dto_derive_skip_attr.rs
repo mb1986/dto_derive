@@ -10,18 +10,18 @@ struct Dto1 { }
 struct Dto2 { }
 
 #[derive(Debug, PartialEq, Dto)]
-#[dto(skip = "a, b, c")] //~ ERROR field 'a' does not exist
+#[dto(skip = "a, b, c")] //~ ERROR cannot skip non-existent field 'a'
 struct Dto3 { }
 
 #[derive(Debug, PartialEq, Dto)]
-#[dto(skip = "a, b, c")] //~ ERROR field 'b' does not exist
+#[dto(skip = "a, b, c")] //~ ERROR cannot skip non-existent field 'b'
 struct Dto4 {
     a: String,
 }
 
 #[derive(Debug, PartialEq, Dto)]
 #[dto(skip = "a, b, c")]
-#[dto(skip = "b")] //~ ERROR already skipped 'b'
+#[dto(skip = "b")] //~ ERROR cannot skip already skipped field 'b'
 struct Dto5 {
     a: String,
     b: String,
@@ -29,7 +29,7 @@ struct Dto5 {
 }
 
 #[derive(Debug, PartialEq, Dto)]
-#[dto(skip = "a, b, b, c")]  //~ ERROR already skipped 'b'
+#[dto(skip = "a, b, b, c")]  //~ ERROR cannot skip already skipped field 'b'
 struct Dto6 {
     a: String,
     b: String,

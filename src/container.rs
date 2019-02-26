@@ -54,7 +54,7 @@ impl<'a> Container<'a> {
             self.entity = Some(entity);
             Ok(())
         } else {
-            Err(Error::new(span, "already set an entity attribute"))
+            Err(Error::new(span, "duplicate `entity` attribute"))
         }
     }
 
@@ -69,7 +69,7 @@ impl<'a> Container<'a> {
         } else {
             Err(Error::new(
                 span,
-                format!("could not map already mapped field '{}'", mapping.target.0),
+                format!("cannot map already mapped field '{}'", mapping.target.0),
             ))
         }
     }
@@ -80,12 +80,18 @@ impl<'a> Container<'a> {
     {
         for s in skip {
             if self.skipped.contains(s) {
-                return Err(Error::new(span, format!("already skipped '{}'", s)));
+                return Err(Error::new(
+                    span,
+                    format!("cannot skip already skipped field '{}'", s),
+                ));
             }
             self.skipped.insert(s.clone());
 
             if self.mapping.remove(&MappingTarget(s.clone())).is_none() {
-                return Err(Error::new(span, format!("field '{}' does not exist", s)));
+                return Err(Error::new(
+                    span,
+                    format!("cannot skip non-existent field '{}'", s),
+                ));
             }
         }
         Ok(())
@@ -96,7 +102,7 @@ impl<'a> Container<'a> {
             self.kind = Some(DtoKind::Request);
             Ok(())
         } else {
-            Err(Error::new(span, "already set an direction attribute"))
+            Err(Error::new(span, "duplicate `request`/`response` attribute"))
         }
     }
 
@@ -105,7 +111,7 @@ impl<'a> Container<'a> {
             self.kind = Some(DtoKind::Response);
             Ok(())
         } else {
-            Err(Error::new(span, "already set an direction attribute"))
+            Err(Error::new(span, "duplicate `request`/`response` attribute"))
         }
     }
 
@@ -113,7 +119,7 @@ impl<'a> Container<'a> {
         let entity = self
             .entity
             .as_ref()
-            .ok_or(Error::new(Span::call_site(), "attribute entity is not set"))?;
+            .ok_or(Error::new(Span::call_site(), "required `entity` attribute"))?;
         let kind = self.get_kind()?;
         self.check_mappings(kind)?;
         Ok(SealedContainer {
@@ -128,7 +134,7 @@ impl<'a> Container<'a> {
     fn get_kind(&self) -> Result<&DtoKind> {
         self.kind.as_ref().or(self.info.kind).ok_or(Error::new(
             Span::call_site(),
-            "could not determine request/response",
+            "required `request`/`response` attribute or struct name ending with `Request`/`Response`",
         ))
     }
 
@@ -141,7 +147,7 @@ impl<'a> Container<'a> {
                     if !self.fields.contains(s) {
                         return Err(Error::new(
                             Span::call_site(),
-                            format!("could not map non-existent field '{}'", s),
+                            format!("cannot map non-existent field '{}'", s),
                         ));
                     }
                 }
@@ -151,7 +157,7 @@ impl<'a> Container<'a> {
                     if !self.fields.contains(t) {
                         return Err(Error::new(
                             Span::call_site(),
-                            format!("could not map non-existent field '{}'", t.0),
+                            format!("cannot map non-existent field '{}'", t.0),
                         ));
                     }
                 }
