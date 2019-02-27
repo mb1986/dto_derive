@@ -1,25 +1,25 @@
-error: already set an direction attribute
+error: duplicate `request`/`response` attribute
  --> $DIR/dto_derive_req_res_attr.rs:6:6
   |
-6 | #[dto(request)] //~ ERROR already set an direction attribute
+6 | #[dto(request)] //~ ERROR duplicate `request`/`response` attribute
   |      ^^^^^^^^^
 
-error: already set an direction attribute
+error: duplicate `request`/`response` attribute
   --> $DIR/dto_derive_req_res_attr.rs:11:6
    |
-11 | #[dto(response)] //~ ERROR already set an direction attribute
+11 | #[dto(response)] //~ ERROR duplicate `request`/`response` attribute
    |      ^^^^^^^^^^
 
-error: already set an direction attribute
+error: duplicate `request`/`response` attribute
   --> $DIR/dto_derive_req_res_attr.rs:16:6
    |
-16 | #[dto(request)] //~ ERROR already set an direction attribute
+16 | #[dto(request)] //~ ERROR duplicate `request`/`response` attribute
    |      ^^^^^^^^^
 
-error: already set an direction attribute
+error: duplicate `request`/`response` attribute
   --> $DIR/dto_derive_req_res_attr.rs:21:6
    |
-21 | #[dto(response)] //~ ERROR already set an direction attribute
+21 | #[dto(response)] //~ ERROR duplicate `request`/`response` attribute
    |      ^^^^^^^^^^
 
 error: aborting due to 4 previous errors

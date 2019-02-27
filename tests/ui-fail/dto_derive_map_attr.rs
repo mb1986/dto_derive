@@ -3,10 +3,10 @@ use dto_derive::Dto;
 
 #[derive(Debug, PartialEq, Dto)]
 #[dto(map = "a: b")]
-#[dto(map = "a: c")] //~ ERROR could not map already mapped field 'a'
+#[dto(map = "a: c")] //~ ERROR cannot map already mapped field 'a'
 struct Dto1 { }
 
-#[derive(Debug, PartialEq, Dto)] //~ ERROR could not map non-existent field 'c'
+#[derive(Debug, PartialEq, Dto)] //~ ERROR cannot map non-existent field 'c'
 #[dto(entity = "Entity")]
 #[dto(request)]
 #[dto(map = "field_a: a")]
@@ -17,7 +17,7 @@ struct Dto2 {
     b: String,
 }
 
-#[derive(Debug, PartialEq, Dto)] //~ ERROR could not map non-existent field 'c'
+#[derive(Debug, PartialEq, Dto)] //~ ERROR cannot map non-existent field 'c'
 #[dto(entity = "Entity")]
 #[dto(response)]
 #[dto(map = "a: field_a")]

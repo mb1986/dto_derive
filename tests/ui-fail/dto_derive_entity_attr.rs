@@ -7,7 +7,7 @@ struct Dto1 { }
 
 #[derive(Debug, PartialEq, Dto)]
 #[dto(entity = "Entity")]
-#[dto(entity = "Entity")] //~ ERROR already set an entity attribute
+#[dto(entity = "Entity")] //~ ERROR duplicate `entity` attribute
 struct Dto2 { }
 
 fn main() { }

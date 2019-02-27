@@ -10,28 +10,28 @@ error: expected at least one field name
 9 | #[dto(skip = "")] //~ ERROR expected at least one field name
   |              ^^
 
-error: field 'a' does not exist
+error: cannot skip non-existent field 'a'
   --> $DIR/dto_derive_skip_attr.rs:13:6
    |
-13 | #[dto(skip = "a, b, c")] //~ ERROR field 'a' does not exist
+13 | #[dto(skip = "a, b, c")] //~ ERROR cannot skip non-existent field 'a'
    |      ^^^^^^^^^^^^^^^^^^
 
-error: field 'b' does not exist
+error: cannot skip non-existent field 'b'
   --> $DIR/dto_derive_skip_attr.rs:17:6
    |
-17 | #[dto(skip = "a, b, c")] //~ ERROR field 'b' does not exist
+17 | #[dto(skip = "a, b, c")] //~ ERROR cannot skip non-existent field 'b'
    |      ^^^^^^^^^^^^^^^^^^
 
-error: already skipped 'b'
+error: cannot skip already skipped field 'b'
   --> $DIR/dto_derive_skip_attr.rs:24:6
    |
-24 | #[dto(skip = "b")] //~ ERROR already skipped 'b'
+24 | #[dto(skip = "b")] //~ ERROR cannot skip already skipped field 'b'
    |      ^^^^^^^^^^^^
 
-error: already skipped 'b'
+error: cannot skip already skipped field 'b'
   --> $DIR/dto_derive_skip_attr.rs:32:6
    |
-32 | #[dto(skip = "a, b, b, c")]  //~ ERROR already skipped 'b'
+32 | #[dto(skip = "a, b, b, c")]  //~ ERROR cannot skip already skipped field 'b'
    |      ^^^^^^^^^^^^^^^^^^^^^
 
 error: aborting due to 6 previous errors

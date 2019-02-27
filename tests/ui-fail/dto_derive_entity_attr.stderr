@@ -4,10 +4,10 @@ error: expected string literal containing entity type
 5 | #[dto(entity = 123)] //~ ERROR expected string literal containing entity type
   |                ^^^
 
-error: already set an entity attribute
+error: duplicate `entity` attribute
   --> $DIR/dto_derive_entity_attr.rs:10:6
    |
-10 | #[dto(entity = "Entity")] //~ ERROR already set an entity attribute
+10 | #[dto(entity = "Entity")] //~ ERROR duplicate `entity` attribute
    |      ^^^^^^^^^^^^^^^^^^^
 
 error: aborting due to 2 previous errors

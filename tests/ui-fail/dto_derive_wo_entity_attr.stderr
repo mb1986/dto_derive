@@ -1,19 +1,19 @@
-error: attribute entity is not set
+error: required `entity` attribute
  --> $DIR/dto_derive_wo_entity_attr.rs:4:28
   |
-4 | #[derive(Debug, PartialEq, Dto)] //~ ERROR attribute entity is not set
+4 | #[derive(Debug, PartialEq, Dto)] //~ ERROR required `entity` attribute
   |                            ^^^
 
-error: attribute entity is not set
+error: required `entity` attribute
  --> $DIR/dto_derive_wo_entity_attr.rs:7:28
   |
-7 | #[derive(Debug, PartialEq, Dto)] //~ ERROR attribute entity is not set
+7 | #[derive(Debug, PartialEq, Dto)] //~ ERROR required `entity` attribute
   |                            ^^^
 
-error: attribute entity is not set
+error: required `entity` attribute
   --> $DIR/dto_derive_wo_entity_attr.rs:10:28
    |
-10 | #[derive(Debug, PartialEq, Dto)] //~ ERROR attribute entity is not set
+10 | #[derive(Debug, PartialEq, Dto)] //~ ERROR required `entity` attribute
    |                            ^^^
 
 error: aborting due to 3 previous errors
