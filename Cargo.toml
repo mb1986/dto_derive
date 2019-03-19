@@ -21,4 +21,4 @@ syn = { version = "0.15", features = ["full", "extra-traits"] }
 quote = "0.6"
 
 [dev-dependencies]
-compiletest_rs = { version = "*", features = ["stable"] }
+compiletest_rs = { version = "0.3.19", features = ["stable"] }
