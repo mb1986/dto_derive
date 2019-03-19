@@ -1,355 +1,204 @@
-# #[derive(Dto)]
+# `#[derive(Dto)]`
 
 [![Build Status](https://travis-ci.com/mb1986/dto_derive.svg?branch=develop)](https://travis-ci.com/mb1986/dto_derive)
 
-This crate provides `Dto` derive for automatic mapping
-DTOs to Entities and vice versa.
+This crate provides `Dto` derive automating the process of mapping DTOs
+(Data Transfer Objects) into Entities and vice versa.
+It is capable of implementing [`From`][from] or [`Into`][into] traits
+for DTO structures regarding conversion direction.
 
-## Data-Transfer-Object Derive
+Every DTO structure can act as a _request_ or a _response_,
+which means that particular DTO structure can be converted
+either from an Entity or into an Entity.
+Therefore, a DTO which should be convertible into an Entity
+is a _request_ DTO and a DTO which should be built from an Entity
+is a _response_ DTO.
 
-- **`#[derive(Dto)]`**
+In addition to a simple one-to-one conversion, the crate allows
+skipping particular fields or renaming them during conversion process.
+More advanced features, like for example, assigning an external values
+or field-level attributes are planned for next releases.
 
-  ```rust
-  #[derive(Dto)]
-  #[dto(entity = "Entity")]
-  struct DtoRequest {
-    ...
-  }
-  ```
+## Installation and basic usage
 
-## Struct Attributes
+Add the following dependency to `Cargo.toml`:
+
+```toml
+[dependencies]
+dto_derive = "0.1.0"
+```
+
+Then import `Dto` derive by:
+
+```rust
+use dto_derive::Dto;
+```
+
+And use it like so:
+
+```rust
+struct Post {
+  ...
+}
+
+#[derive(Dto)]
+#[dto(entity = "Post")]
+struct PostResponse {
+  ...
+}
+```
+
+That enables you to convert `Post` into `PostResponse` in this case:
+
+```rust
+let post: Post = ...;
+let post_response: PostResponse = post.into();
+```
+
+For more examples and use cases check sections below.
+
+## Derive associated attributes
 
 - **`#[dto(entity = "Entity")]`**
 
-  Required attribute, has to point to an entity-structure type.
-
-  ```rust
-  impl Into<Entity> for DtoRequest {
-    ...
-  }
-  ```
-
-  ```rust
-  impl From<Entity> for DtoResponse {
-    ...
-  }
-  ```
-
-- **`#[dto(entity = "Entity", with = "String, String")]`**
-
-  Extended version of attribute with additional arguments.
-
-  ```rust
-  impl Into<Entity> for (DtoRequest, String, String) {
-    ...
-  }
-  ```
-
-  ```rust
-  impl From<(Entity, String, String)> for DtoResponse) {
-    ...
-  }
-  ```
+  Required attribute containing a type of a mapped entity.
+  It has to be provided exactly once per DTO structure.
 
 - **`#[dto(request)]`**, **`#[dto(response)]`**
 
-  Needed when dto-struct name does not end with `Request` or `Response`.
+  Optional attributes specifying a conversion direction,
+  can be omitted when DTO structure name ends with `...Request`
+  or `...Response`, e.g., `PostResponse`, otherwise have to be provided.
 
-  ```rust
-  #[derive(Dto)]
-  #[dto(request)]
-  struct FirstDto {
-    ...
-  }
+- **`#[dto(map = "a: b")]`**
 
-  #[derive(Dto)]
-  #[dto(response)]
-  struct SecondDto {
-    ...
-  }
-  ```
+  Optional attribute telling how to rename field names during conversion.
+  It may be repeated for different fields.
 
-  Above code is functional equivalent to:
+- **`#[dto(skip = "a, b, c")]`**
 
-  ```rust
-  #[derive(Dto)]
-  struct FirstDtoRequest {
-    ...
-  }
+  Optional attribute containing field names
+  which should be omitted during conversion.
+  It may contain multiple fields to skip and/or
+  it may by repeated for different fields.
+  **The attribute is only valid for _request_ DTOs.**
 
-  #[derive(Dto)]
-  struct SecondDtoResponse {
-    ...
-  }
-  ```
+## Examples
 
-  <!-- ```rust
-  use syn::Ident;
-  ``` -->
+Let's start with our `Post` entity implementation:
 
-- **`#[dto(map = "a: Uuid::new_v4()")]`**
+```rust
+struct Post {
+    title: String,
+    body: String,
+}
+```
 
-  Assigns a value of a given expression.
+### Request DTO
 
-  ```rust
-  #[derive(Dto)]
-  #[dto(entity = "Entity")]
-  #[dto(map = "c: Uuid::new_v4()")]
-  struct DtoRequest {
-    pub a: String,
-    pub b: String,
-  }
-  ```
+In order to create a new post we may have a DTO representation:
 
-  produces:
+```rust
+#[derive(Dto)]
+#[dto(entity = "Post")]
+#[dto(request)]
+#[dto(map = "body: content")]
+#[dto(skip = "csrf_token")]
+struct NewPost {
+    title: String,
+    content: String,
+    csrf_token: String,
+}
+```
 
-  ```rust
-  impl Into<Entity> for DtoRequest {
-    fn into(self) -> Entity {
-      Entity {
-        a: self.a,
-        b: self.b,
-        c: Uuid::new_v4(),
-      }
+Above DTO may be converted to the `Post` entity using [`into()`][into_into]
+function from [`Into`][into] trait:
+
+```rust
+let newPost = NewPost {
+    title: String::from("Awesome post"),
+    content: String::from("Awesome content of awesome post."),
+    csrf_token: String::from("abcde"),
+};
+
+let post: Post = newPost.into();
+```
+
+It is possible because `NewPost` DTO is implementing [`Into`][into] trait
+due to `Dto` derive.
+
+### Response DTO
+
+Response DTO may look like:
+
+```rust
+#[derive(Dto)]
+#[dto(entity = "Post")]
+#[dto(map = "content: body")]
+struct PostResponse {
+    title: String,
+    content: String,
+}
+```
+
+The conversion from entity to `PostResponse` DTO may be done using
+[`into()`][into_into] function from [`Into`][into] trait:
+
+```rust
+let post = Post {
+    title: String::from("Awesome post"),
+    body: String::from("Awesome content of awesome post."),
+};
+
+let postResponse: PostResponse = post.into();
+```
+
+It is possible because `PostResponse` DTO is implementing [`From`][from] trait
+due to `Dto` derive.
+
+## Under the hood
+
+Adding `#[derive(Dto)]` attribute means providing automatic implementation
+of [`From`][from] or [`Into`][into] trait for a given structure.
+
+Thus, for the `NewPost` DTO structure and the `Post` entity
+(from previous section), below implementation will be automatically provided
+(notice the _request_ nature of the `NewPost` DTO):
+
+```rust
+impl Into<Post> for NewPost {
+    fn into(self) -> Post {
+        Post {
+            title: self.title,
+            body: self.content,
+        }
     }
-  }
-  ```
+}
+```
 
-  ```rust
-  #[derive(Dto)]
-  #[dto(entity = "Entity")]
-  #[dto(map = "c: Uuid::new_v4()")]
-  struct DtoResponse {
-    pub a: String,
-    pub b: String,
-    pub c: Uuid,
-  }
-  ```
+The opposite implementation will be derived for the `PostResponse` DTO
+which is in fact a _response_ DTO:
 
-  produces:
-
-  ```rust
-  impl From<Entity> for DtoResponse {
-    fn from(entity: Entity) -> Self {
-      Self {
-        a: entity.a,
-        b: entity.b,
-        c: Uuid::new_v4(),
-      }
+```rust
+impl From<Post> for PostResponse {
+    fn from(entity: Post) -> Self {
+        PostResponse {
+            title: entity.title,
+            content: entity.body,
+        }
     }
-  }
-  ```
+}
+```
 
-  <!-- ```rust
-  use syn::ExprCall;
-  ``` -->
+It is worth noting that a derive implementation is always provided **for** DTO
+structures which allows to import entity structures from another crate
+without breaking the [_orphan rule_][orphan_rule].
 
-- **`#[dto(map = "a: |dto| dto.b")]`**
+## License
 
-  Assigns a value of a result of given closure.
+Licensed under the MIT license ([LICENSE](LICENSE) or <https://opensource.org/licenses/MIT>).
 
-  ```rust
-  #[derive(Dto)]
-  #[dto(entity = "Entity")]
-  #[dto(map = "c: |ref dto| dto.c.to_hyphenated().to_string()")]
-  struct DtoRequest {
-    pub a: String,
-    pub b: String,
-    pub c: Uuid,
-  }
-  ```
-
-  produces:
-
-  ```rust
-  impl Into<Entity> for DtoRequest {
-    fn into(self) -> Entity {
-      Entity {
-        a: self.a,
-        b: self.b,
-        c: (|ref dto| dto.c.to_hyphenated().to_string())(self),
-      }
-    }
-  }
-  ```
-
-  ```rust
-  #[derive(Dto)]
-  #[dto(entity = "Entity")]
-  #[dto(map = "c: |ref entity| Uuid::parse_str(entity.c).unwarp()")]
-  struct DtoResponse {
-    pub a: String,
-    pub b: String,
-    pub c: Uuid,
-  }
-  ```
-
-  produces:
-
-  ```rust
-  impl From<Entity> for DtoResponse {
-    fn from(entity: Entity) -> Self {
-      Self {
-        a: entity.a,
-        b: entity.b,
-        c: (|ref entity| Uuid::parse_str(entity.c).unwarp())(entity),
-      }
-    }
-  }
-  ```
-
-  <!-- ```rust
-  use syn::ExprClosure; // features = "full"
-  ``` -->
-
-- **`#[dto(map = "c: 1")]`**
-
-  Only for **requests**.
-
-  ```rust
-  #[derive(Dto)]
-  #[dto(entity = "Entity", with = "Uuid")]
-  #[dto(map = "c: 1")]
-  struct DtoRequest {
-    pub a: String,
-    pub b: String,
-  }
-  ```
-
-  produces:
-
-  ```rust
-  impl Into<Entity> for (DtoRequest, Uuid) {
-    fn into(self) -> Entity {
-      Entity {
-        a: self.0.a,
-        b: self.0.b,
-        c: self.1,
-      }
-    }
-  }
-  ```
-
-<!--
-- `#[dto(for Entity)]` -> `#[dto(entity = "Entity")]`
-- `#[dto(for Entity, String, String)]` -> `#[dto(entity = "Entity", args = "String, String")]`
-- `#[dto(map a: b)]` -> `#[dto(map = "a: b")]`
-- `#[dto(request)]`
-- `#[dto(response)]`
-- `#[dto(skip c)]` -> `#[dto(skip = "c")]`
-- `#[dto(skip c, d, e)]` -> `#[dto(skip = "c, d, e")]`
--->
-
-## Field Attributes
-
-- **`#[dto(map = "a")]`**
-
-  ```rust
-  #[derive(Dto)]
-  #[dto(entity = "Entity")]
-  struct DtoRequest {
-    #[dto(map = "c")]
-    pub a: String,
-    pub b: String,
-  }
-  ```
-
-  produces:
-
-  ```rust
-  impl Into<Entity> for DtoRequest {
-    fn into(self) -> Entity {
-      Entity {
-        c: self.a,
-        b: self.b,
-      }
-    }
-  }
-  ```
-
-  ```rust
-  #[derive(Dto)]
-  #[dto(entity = "Entity")]
-  struct DtoResponse {
-    #[dto(map = "c")]
-    pub a: String,
-    pub b: String,
-  }
-  ```
-
-  produces:
-
-  ```rust
-  impl From<Entity> for DtoResponse {
-    fn from(entity: Entity) -> Self {
-      Self {
-        a: entity.c,
-        b: entity.b,
-      }
-    }
-  }
-  ```
-
-- **`#[dto(map = 1)]`**
-
-  Only for **responses**.
-
-  ```rust
-  #[derive(Dto)]
-  #[dto(entity = "Entity", with = "Uuid")]
-  struct DtoResponse {
-    pub a: String,
-    pub b: String,
-    #[dto(map = 1)]
-    pub c: Uuid,
-  }
-  ```
-
-  produces:
-
-  ```rust
-  impl From<(Entity, Uuid)> for DtoResponse {
-    fn from(entity: (Entity, Uuid)) -> Self {
-      Self {
-        a: entity.0.b,
-        b: entity.0.b,
-        c: entity.1,
-      }
-    }
-  }
-  ```
-
-- **`#[dto(skip)]`**
-
-  Only for **requests**.
-
-  ```rust
-  #[derive(Dto)]
-  #[dto(entity = "Entity")]
-  struct DtoRequest {
-    pub a: String,
-    pub b: String,
-    #[dto(skip)]
-    pub c: Uuid,
-    pub d: String,
-  }
-  ```
-
-  produces:
-
-  ```rust
-  impl Into<Entity> for DtoRequest {
-    fn into(self) -> Entity {
-      Entity {
-        a: self.a,
-        b: self.b,
-        d: self.d,
-      }
-    }
-  }
-  ```
-
-<!--
-- `#[dto(map a)]` -> `#[dto(map = "a")]`
-- `#[dto(skip)]`
--->
+[from]: https://doc.rust-lang.org/std/convert/trait.From.html
+[into]: https://doc.rust-lang.org/std/convert/trait.Into.html
+[into_into]: https://doc.rust-lang.org/std/convert/trait.Into.html#tymethod.into
+[orphan_rule]: https://doc.rust-lang.org/book/ch10-02-traits.html#implementing-a-trait-on-a-type
