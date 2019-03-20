@@ -1,6 +1,6 @@
 use proc_macro2::Span;
 use syn::parse::{Parse, ParseStream};
-use syn::{Error, Expr, Ident, Lit, Path, Result, Token};
+use syn::{Error, Expr, ExprField, Ident, Lit, Path, Result, Token};
 
 use super::SpannedParse;
 use crate::mapping::{Mapping, MappingSource, MappingTarget};
@@ -36,6 +36,13 @@ impl SpannedParse for MapStructAttr {
                     },
                     span,
                 }),
+                Expr::Field(ref expr) if expr.valid() => Ok(MapStructAttr {
+                    mapping: Mapping {
+                        target: MappingTarget(left),
+                        source: MappingSource::NestedField(expr.clone()),
+                    },
+                    span,
+                }),
                 _ => Err(Error::new_spanned(right, "unexpected expression")),
             }
         } else {
@@ -43,6 +50,23 @@ impl SpannedParse for MapStructAttr {
                 map_lit,
                 "expected string literal containing mapping expression",
             ))
+        }
+    }
+}
+
+trait FieldPath {
+    fn valid(&self) -> bool;
+}
+
+impl FieldPath for ExprField {
+    fn valid(&self) -> bool {
+        let mut curr = self;
+        loop {
+            match *curr.base {
+                Expr::Field(ref expr) => curr = expr,
+                Expr::Path(ref expr) if expr.path.check_ident() => break true,
+                _ => break false,
+            }
         }
     }
 }

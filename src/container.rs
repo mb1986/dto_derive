@@ -62,6 +62,7 @@ impl<'a> Container<'a> {
         if !self.mapped.contains(&mapping.target) {
             self.mapping.remove(&MappingTarget(match mapping.source {
                 MappingSource::Field(ref ident) => ident.clone(),
+                _ => Ident::new("not_implemented", Span::call_site()),
             }));
             self.mapped.insert(mapping.target.0.clone());
             self.mapping.insert(mapping.target, mapping.source);
@@ -143,6 +144,7 @@ impl<'a> Container<'a> {
             DtoKind::Request => {
                 for s in self.mapping.values().filter_map(|v| match v {
                     MappingSource::Field(ident) => Some(ident),
+                    _ => None,
                 }) {
                     if !self.fields.contains(s) {
                         return Err(Error::new(

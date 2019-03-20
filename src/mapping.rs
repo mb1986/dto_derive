@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 use std::ops::Deref;
-use syn::Ident;
+use syn::{Ident, ExprField};
 
 #[derive(Debug)]
 pub(crate) struct Mapping {
@@ -29,12 +29,14 @@ impl ToTokens for MappingTarget {
 #[derive(Debug)]
 pub(crate) enum MappingSource {
     Field(Ident),
+    NestedField(ExprField),
 }
 
 impl ToTokens for MappingSource {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         match self {
             MappingSource::Field(ref ident) => ident.to_tokens(tokens),
+            MappingSource::NestedField(ref field) => field.to_tokens(tokens),
         }
     }
 }
