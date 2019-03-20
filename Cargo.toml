@@ -3,7 +3,7 @@ name = "dto_derive"
 description = """
 Derive for automatic mapping DTOs to Entities and vice versa.
 """
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Michał Blinkiewicz <michal.blinkiewicz@gmail.com>"]
 repository = "https://github.com/mb1986/dto_derive"
 readme = "README.md"
@@ -21,4 +21,4 @@ syn = { version = "0.15", features = ["full", "extra-traits"] }
 quote = "0.6"
 
 [dev-dependencies]
-compiletest_rs = { version = "0.3.19", features = ["stable"] }
+compiletest_rs = { version = "=0.3.19", features = ["stable"] }
