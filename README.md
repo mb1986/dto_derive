@@ -26,7 +26,7 @@ Add the following dependency to `Cargo.toml`:
 
 ```toml
 [dependencies]
-dto_derive = "0.1.0"
+dto_derive = "0.1.1"
 ```
 
 Then import `Dto` derive by:
