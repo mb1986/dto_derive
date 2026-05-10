@@ -34,7 +34,7 @@ pub(crate) enum MappingSource {
 impl ToTokens for MappingSource {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         match self {
-            MappingSource::Field(ref ident) => ident.to_tokens(tokens),
+            MappingSource::Field(ident) => ident.to_tokens(tokens),
         }
     }
 }

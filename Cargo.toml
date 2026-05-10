@@ -10,7 +10,8 @@ readme = "README.md"
 license = "MIT"
 keywords = ["dto", "data", "transfer", "entity", "derive"]
 categories = ["data-structures", "web-programming", "rust-patterns"]
-edition = "2018"
+edition = "2024"
+rust-version = "1.85"
 
 [lib]
 proc-macro = true
