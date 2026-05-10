@@ -9,12 +9,16 @@ error: cannot map non-existent field 'c'
   |
 9 | #[derive(Debug, PartialEq, Dto)] //~ ERROR cannot map non-existent field 'c'
   |                            ^^^
+  |
+  = note: this error originates in the derive macro `Dto` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error: cannot map non-existent field 'c'
   --> $DIR/dto_derive_map_attr.rs:20:28
    |
 20 | #[derive(Debug, PartialEq, Dto)] //~ ERROR cannot map non-existent field 'c'
    |                            ^^^
+   |
+   = note: this error originates in the derive macro `Dto` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error: aborting due to 3 previous errors
 
