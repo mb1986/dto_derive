@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   surface is unchanged.
 - Replaced the `compiletest_rs` dev-dependency with `trybuild` for
   UI tests, restoring compatibility with current stable Rust.
+- Request-direction conversions are now emitted as
+  `impl From<Dto> for Entity` instead of `impl Into<Entity> for Dto`,
+  mirroring the response direction. The previous `Into` form was a
+  workaround for pre-1.41 coherence rules made unnecessary by the
+  new MSRV. Existing `dto.into()` call sites are unaffected;
+  consumers can now also write `Entity::from(dto)`.
 
 ## [0.1.1] — 2019-03-21
 
