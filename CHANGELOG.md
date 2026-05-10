@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Declared minimum supported Rust version (MSRV) of 1.85.
+
+### Changed
+- Bumped the crate to Rust edition 2024.
+- Upgraded `syn` from 0.15 to 2, `proc-macro2` from 0.4 to 1, and
+  `quote` from 0.6 to 1, bringing transitive dependencies in line
+  with the modern proc-macro ecosystem. The `Dto` derive's public
+  surface is unchanged.
+- Replaced the `compiletest_rs` dev-dependency with `trybuild` for
+  UI tests, restoring compatibility with current stable Rust.
+
 ## [0.1.1] — 2019-03-21
 
 ### Fixed
