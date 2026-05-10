@@ -45,5 +45,4 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
       - uses: Swatinem/rust-cache@v2
-      - run: cargo build --verbose
       - run: cargo test --verbose
