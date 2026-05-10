@@ -1,6 +1,6 @@
 use proc_macro2::Span;
-use syn::parse::{Parse, ParseStream};
-use syn::{parenthesized, Attribute, Result};
+use syn::parse::ParseStream;
+use syn::{Attribute, Result};
 
 mod entity_struct_attr;
 pub(crate) use self::entity_struct_attr::EntityStructAttr;
@@ -38,23 +38,19 @@ pub(crate) enum StructAttr {
     Response(ResponseStructAttr),
 }
 
-impl Parse for StructAttr {
-    fn parse(input: ParseStream) -> Result<Self> {
-        let content;
-        let paren = parenthesized!(content in input);
-
-        let lookahead = content.lookahead1();
-
+impl StructAttr {
+    fn parse_inner(input: ParseStream, span: Span) -> Result<Self> {
+        let lookahead = input.lookahead1();
         if lookahead.peek(kw::entity) {
-            EntityStructAttr::parse(&content, paren.span).map(StructAttr::Entity)
+            EntityStructAttr::parse(input, span).map(StructAttr::Entity)
         } else if lookahead.peek(kw::skip) {
-            SkipStructAttr::parse(&content, paren.span).map(StructAttr::Skip)
+            SkipStructAttr::parse(input, span).map(StructAttr::Skip)
         } else if lookahead.peek(kw::map) {
-            MapStructAttr::parse(&content, paren.span).map(StructAttr::Map)
+            MapStructAttr::parse(input, span).map(StructAttr::Map)
         } else if lookahead.peek(kw::request) {
-            RequestStructAttr::parse(&content, paren.span).map(StructAttr::Request)
+            RequestStructAttr::parse(input, span).map(StructAttr::Request)
         } else if lookahead.peek(kw::response) {
-            ResponseStructAttr::parse(&content, paren.span).map(StructAttr::Response)
+            ResponseStructAttr::parse(input, span).map(StructAttr::Response)
         } else {
             Err(lookahead.error())
         }
@@ -65,8 +61,11 @@ pub(crate) fn parse_struct_attrs<T>(attrs: &[Attribute], mut handler: T) -> Resu
 where
     T: FnMut(StructAttr) -> Result<()>,
 {
-    for attr in attrs.iter().filter(|attr| attr.path.is_ident("dto")) {
-        handler(syn::parse2(attr.tts.clone())?)?;
+    for attr in attrs.iter().filter(|attr| attr.path().is_ident("dto")) {
+        let span = attr.meta.require_list()?.delimiter.span().join();
+        let parsed =
+            attr.parse_args_with(|input: ParseStream| StructAttr::parse_inner(input, span))?;
+        handler(parsed)?;
     }
     Ok(())
 }

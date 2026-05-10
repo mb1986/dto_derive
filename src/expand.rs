@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 
-use crate::dto_info::DtoKind;
 use crate::SealedContainer;
+use crate::dto_info::DtoKind;
 
 mod expand_request;
 use expand_request::expand_request;

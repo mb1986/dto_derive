@@ -1,6 +1,6 @@
 use proc_macro2::Span;
-use syn::parse::ParseStream;
 use syn::Result;
+use syn::parse::ParseStream;
 
 use super::SpannedParse;
 

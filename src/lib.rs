@@ -1,17 +1,14 @@
-extern crate proc_macro;
-
 use proc_macro::TokenStream;
-use syn::{parse_macro_input, DeriveInput, Result};
+use syn::{DeriveInput, Result, parse_macro_input};
 
 use crate::container::{Container, SealedContainer};
 use crate::dto_info::DtoInfo;
 use crate::expand::expand;
-use crate::parse::{parse_struct_attrs, StructAttr};
+use crate::parse::{StructAttr, parse_struct_attrs};
 
 mod container;
 mod dto_info;
 mod expand;
-mod helpers;
 mod mapping;
 mod parse;
 
