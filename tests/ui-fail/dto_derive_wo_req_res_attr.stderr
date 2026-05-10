@@ -1,10 +1,7 @@
 error: required `request`/`response` attribute or struct name ending with `Request`/`Response`
- --> $DIR/dto_derive_wo_req_res_attr.rs:4:28
+ --> tests/ui-fail/dto_derive_wo_req_res_attr.rs:4:28
   |
 4 | #[derive(Debug, PartialEq, Dto)] //~ ERROR required `request`/`response` attribute or struct name ending with `Request`/`Response`
   |                            ^^^
   |
   = note: this error originates in the derive macro `Dto` (in Nightly builds, run with -Z macro-backtrace for more info)
-
-error: aborting due to 1 previous error
-

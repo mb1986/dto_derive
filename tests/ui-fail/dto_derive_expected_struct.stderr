@@ -1,8 +1,5 @@
 error: expected struct
- --> $DIR/dto_derive_expected_struct.rs:5:6
+ --> tests/ui-fail/dto_derive_expected_struct.rs:5:6
   |
 5 | enum EnumDto { } //~ ERROR expected struct
   |      ^^^^^^^
-
-error: aborting due to 1 previous error
-
