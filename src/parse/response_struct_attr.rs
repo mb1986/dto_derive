@@ -1,12 +1,11 @@
 use proc_macro2::Span;
 use syn::parse::ParseStream;
-use syn::{Ident, Result};
+use syn::Result;
 
 use super::SpannedParse;
 
 #[derive(Debug, Clone)]
 pub(crate) struct ResponseStructAttr {
-    pub(crate) ident: Ident,
     pub(crate) span: Span,
 }
 
@@ -15,8 +14,8 @@ impl SpannedParse for ResponseStructAttr {
         let lookahead = input.lookahead1();
         if lookahead.peek(super::kw::response) {
             input
-                .parse()
-                .map(|ident| ResponseStructAttr { ident, span })
+                .parse::<super::kw::response>()
+                .map(|_| ResponseStructAttr { span })
         } else {
             Err(lookahead.error())
         }

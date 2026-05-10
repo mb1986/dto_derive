@@ -15,7 +15,7 @@ pub(crate) struct DtoInfo<'a> {
 }
 
 impl DtoInfo<'_> {
-    pub(crate) fn from_derive(derive: &DeriveInput) -> Result<DtoInfo> {
+    pub(crate) fn from_derive(derive: &DeriveInput) -> Result<DtoInfo<'_>> {
         let dto_type = &derive.ident;
         let kind = get_dto_kind(dto_type);
         let fields = get_dto_fields(derive)?;

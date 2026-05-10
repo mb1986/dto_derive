@@ -61,11 +61,11 @@ impl Parse for StructAttr {
     }
 }
 
-pub(crate) fn parse_struct_attrs<T>(attrs: &Vec<Attribute>, mut handler: T) -> Result<()>
+pub(crate) fn parse_struct_attrs<T>(attrs: &[Attribute], mut handler: T) -> Result<()>
 where
     T: FnMut(StructAttr) -> Result<()>,
 {
-    for ref attr in attrs.iter().filter(|attr| attr.path.is_ident("dto")) {
+    for attr in attrs.iter().filter(|attr| attr.path.is_ident("dto")) {
         handler(syn::parse2(attr.tts.clone())?)?;
     }
     Ok(())

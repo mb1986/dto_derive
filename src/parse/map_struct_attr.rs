@@ -32,7 +32,7 @@ impl SpannedParse for MapStructAttr {
                 Expr::Path(ref expr) if expr.path.check_ident() => Ok(MapStructAttr {
                     mapping: Mapping {
                         target: MappingTarget(left),
-                        source: MappingSource::Field(expr.path.into_ident()),
+                        source: MappingSource::Field(expr.path.to_ident()),
                     },
                     span,
                 }),
@@ -49,7 +49,7 @@ impl SpannedParse for MapStructAttr {
 
 trait IntoIdent {
     fn check_ident(&self) -> bool;
-    fn into_ident(&self) -> Ident;
+    fn to_ident(&self) -> Ident;
 }
 
 impl IntoIdent for Path {
@@ -66,7 +66,7 @@ impl IntoIdent for Path {
                 .is_lowercase()
     }
 
-    fn into_ident(&self) -> Ident {
+    fn to_ident(&self) -> Ident {
         self.segments[0].ident.clone()
     }
 }

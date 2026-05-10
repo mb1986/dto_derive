@@ -115,7 +115,7 @@ impl<'a> Container<'a> {
         }
     }
 
-    pub(crate) fn seal(&self) -> Result<SealedContainer> {
+    pub(crate) fn seal(&self) -> Result<SealedContainer<'_>> {
         let entity = self
             .entity
             .as_ref()
@@ -141,8 +141,8 @@ impl<'a> Container<'a> {
     fn check_mappings(&self, kind: &DtoKind) -> Result<()> {
         match kind {
             DtoKind::Request => {
-                for s in self.mapping.values().filter_map(|v| match v {
-                    MappingSource::Field(ident) => Some(ident),
+                for s in self.mapping.values().map(|v| match v {
+                    MappingSource::Field(ident) => ident,
                 }) {
                     if !self.fields.contains(s) {
                         return Err(Error::new(

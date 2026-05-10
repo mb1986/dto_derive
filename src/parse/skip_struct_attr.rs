@@ -19,7 +19,7 @@ impl SpannedParse for SkipStructAttr {
         let skip_lit = input.parse::<Lit>()?;
         if let Lit::Str(ref skip_names) = skip_lit {
             let skip_fields = skip_names.parse::<Sequence<Ident, Token![,]>>()?;
-            if skip_fields.len() == 0 {
+            if skip_fields.is_empty() {
                 Err(Error::new_spanned(
                     skip_lit,
                     "expected at least one field name",
