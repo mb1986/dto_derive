@@ -11,12 +11,12 @@ pub(crate) fn expand_request(cont: &SealedContainer) -> TokenStream {
     let mappings: Vec<TokenStream> = cont
         .mapping
         .iter()
-        .map(|(l, r)| quote! { #l: self.#r })
+        .map(|(l, r)| quote! { #l: dto.#r })
         .collect();
 
     let result = quote! {
-        impl #impl_generics Into<#entity> for #dto #ty_generics #where_clause {
-            fn into(self) -> #entity {
+        impl #impl_generics From<#dto #ty_generics> for #entity #where_clause {
+            fn from(dto: #dto #ty_generics) -> #entity {
                 #entity {
                     #(#mappings),*
                 }
