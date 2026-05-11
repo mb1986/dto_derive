@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/mb1986/dto_derive/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mb1986/dto_derive/actions/workflows/ci.yml)
 [![Current Crates.io Version](https://img.shields.io/crates/v/dto_derive.svg)](https://crates.io/crates/dto_derive)
+[![MSRV](https://img.shields.io/crates/msrv/dto_derive.svg)](https://crates.io/crates/dto_derive)
 
 This crate provides `Dto` derive automating the process of mapping DTOs
 (Data Transfer Objects) into Entities and vice versa.
