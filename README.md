@@ -195,6 +195,59 @@ It is worth noting that a derive implementation is always provided **for** DTO
 structures which allows to import entity structures from another crate
 without breaking the [_orphan rule_][orphan_rule].
 
+## Entity field visibility
+
+The generated `From` implementation lives in the DTO's module and uses a
+struct literal to either construct the entity (for _request_ DTOs)
+or read its fields (for _response_ DTOs). Both forms are subject to
+Rust's normal [field visibility rules][field_visibility], so
+**every entity field referenced by the conversion must be visible
+from the DTO's module** — typically declared as `pub` or `pub(crate)`.
+
+For instance, the following snippet will not compile because `PostVo`'s
+fields default to module-private, even though both types live in the
+same crate:
+
+```rust
+mod vo {
+    pub struct PostVo {
+        title: String, // private to `vo`
+        body: String,  // private to `vo`
+    }
+}
+
+use vo::PostVo;
+
+#[derive(Dto)]
+#[dto(entity = "PostVo")]
+#[dto(request)]
+struct NewPost {
+    title: String,
+    body: String,
+}
+```
+
+`rustc` reports the error against the derive attribute:
+
+```text
+error[E0451]: fields `title` and `body` of struct `PostVo` are private
+```
+
+Marking the fields `pub(crate)` (or `pub`) resolves it:
+
+```rust
+mod vo {
+    pub struct PostVo {
+        pub(crate) title: String,
+        pub(crate) body: String,
+    }
+}
+```
+
+The same requirement applies to fields renamed via `#[dto(map = "…")]`;
+`#[dto(skip = "…")]` simply omits the field from the conversion and
+therefore does not require it to be visible.
+
 ## License
 
 Licensed under the MIT license ([LICENSE](LICENSE) or <https://opensource.org/licenses/MIT>).
@@ -203,3 +256,4 @@ Licensed under the MIT license ([LICENSE](LICENSE) or <https://opensource.org/li
 [into]: https://doc.rust-lang.org/std/convert/trait.Into.html
 [into_into]: https://doc.rust-lang.org/std/convert/trait.Into.html#tymethod.into
 [orphan_rule]: https://doc.rust-lang.org/book/ch10-02-traits.html#implementing-a-trait-on-a-type
+[field_visibility]: https://doc.rust-lang.org/reference/visibility-and-privacy.html
